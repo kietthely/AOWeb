@@ -24,10 +24,11 @@ namespace AOWebApp.Models
         [Display(Name = "Item Description")]
 
         public string ItemDescription { get; set; } = null!;
+
+
         [Required(ErrorMessage = "Please provide the cost of this item")]
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(10,2)")]
-
         public decimal ItemCost { get; set; }
         [Required(ErrorMessage ="Please provide the item image url")]
         [DataType(DataType.ImageUrl)]
