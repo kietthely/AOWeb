@@ -1,63 +1,57 @@
 ﻿@model IEnumerable<AOWebApp.Models.Item>
 
+
 @{
     ViewData["Title"] = "Index";
 }
+<div class="container">
+    <div class="justify-content-center">
+        <h1 class="text-center">Shop Items</h1>
+    </div>
+</div>
 
-<h1>Index</h1>
+<form asp-controller="Items" asp-action="Index">
+    <input type="text" name="searchText" value="@ViewBag.searchText" class="form-control" placeholder="Search products" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemCost)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemImage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemCost)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemImage)
-            </td>
-            <td>
-                    @if (item.Category != null)
-                    {
-                        Html.DisplayFor(modelItem => item.Category.CategoryId);
-                    }
-                    
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ItemId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ItemId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ItemId">Delete</a>
-            </td>
-        </tr>
+    <a class="btn btn-outline-info" asp-action="Create" asp-controller="Items">Create a new Item</a>
+</form>
+
+<p>Items found: @Model.Count()/@ViewData["maxNumberOfItems"] </p>
+
+@{
+    if (Model.Count() == 0)
+    {
+        <p class="alert-info text-center">No items with the keywords provided!</p>
+    }
 }
-    </tbody>
-</table>
+<div class="container">
+    <div class="row row-cols-3 row-cols-md-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card">
+                    <img src="@item.ItemImage" class="card-img-top" alt="Item Image">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.ItemName</h5>
+                        @{
+                            var truncatedDescription = item.ItemDescription;
+                            if (item.ItemDescription.Length > 100)
+
+                            {
+                                truncatedDescription = item.ItemDescription.Substring(0, 100) + "...";
+                            }
+                        }
+                        <p class="card-text">Description: @truncatedDescription</p>
+                        <p class="card-text">Cost: &#36 @item.ItemCost</p>
+                        @if (item.Category != null)
+                        {
+                            <p class="card-text">Category: @item.Category.CategoryId</p>
+
+                        }
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ItemId" class="btn btn-primary">View Item Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
