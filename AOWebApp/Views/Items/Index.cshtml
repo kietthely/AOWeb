@@ -46,7 +46,11 @@
                 @Html.DisplayFor(modelItem => item.ItemImage)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryId)
+                    @if (item.Category != null)
+                    {
+                        Html.DisplayFor(modelItem => item.Category.CategoryId);
+                    }
+                    
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ItemId">Edit</a> |

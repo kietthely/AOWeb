@@ -9,8 +9,8 @@ namespace AOWebApp.Models.CodeFirst
         public int itemID { get; set; }
         [Required]
         [Display(Name = "Item Name")]
-        [StringLength(100, ErrorMessage ="The item name must be less than 100 characters")]
-        public string itemName { get; set; }
+        [StringLength(100, ErrorMessage = "The item name must be less than 100 characters")]
+        public string itemName { get; set; } = null!;
 
 
         [Required(ErrorMessage ="You must provide an item price")]
