@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using AOWebApp.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<AOWebAppContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AOWebAppContext") ?? throw new InvalidOperationException("Connection string 'AOWebAppContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
