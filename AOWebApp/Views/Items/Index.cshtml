@@ -9,14 +9,27 @@
         <h1 class="text-center">Shop Items</h1>
     </div>
 </div>
-
-<form asp-controller="Items" asp-action="Index">
-    <input type="text" name="searchText" value="@ViewBag.searchText" class="form-control" placeholder="Search products" />
-
-    <a class="btn btn-outline-info" asp-action="Create" asp-controller="Items">Create a new Item</a>
+<form method="post" asp-controller="Items" asp-action="Index" >
+    <div class="row align-items-center">
+        <div class="col-md-4">
+            <input type="text" name="searchText" value="@ViewBag.searchText" class="form-control" placeholder="Search products..." />
+        </div>
+        <div class="col-md-3">
+            <select name="categoryId" class="form-control form-select" asp-items="@ViewBag.CategoryList">
+                <option selected value="">All Categories</option>
+            </select>
+        </div>
+        <div class="col-md-auto">
+            <button type="submit" class="btn btn-outline-info btn-block">Search</button>
+        </div>
+        <div class="col-md-auto">
+            <a class="btn btn-outline-info btn-block" asp-action="Create" asp-controller="Items">Create a new Item</a>
+        </div>
+    </div>
+    <p>Items found: @Model.Count()/@ViewData["maxNumberOfItems"] </p>
 </form>
 
-<p>Items found: @Model.Count()/@ViewData["maxNumberOfItems"] </p>
+
 
 @{
     if (Model.Count() == 0)
@@ -30,9 +43,9 @@
         {
             <div class="col">
                 <div class="card">
-                    <img src="@item.ItemImage" class="card-img-top" alt="Item Image">
                     <div class="card-body">
                         <h5 class="card-title">@item.ItemName</h5>
+                     
                         @{
                             var truncatedDescription = item.ItemDescription;
                             if (item.ItemDescription.Length > 100)
@@ -41,15 +54,16 @@
                                 truncatedDescription = item.ItemDescription.Substring(0, 100) + "...";
                             }
                         }
+                        @if (item.Category != null)
+                        {
+                            <p class="card-text">Category: @item.Category.CategoryName</p>
+                        }
                         <p class="card-text">Description: @truncatedDescription</p>
 
                         <p class="card-text">Cost: &#36 @item.ItemCost</p>
-                        @if (item.Category != null)
-                        {
-                            <p class="card-text">Category: @item.Category.CategoryId</p>
+                        <img src="@item.ItemImage" class="card-img-bottom" alt="Item Image">
 
-                        }
-                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ItemId" class="btn btn-primary">View Item Details</a>
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ItemId" class="btn btn-outline-primary">View Item Details</a>
                     </div>
                 </div>
             </div>

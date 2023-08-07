@@ -20,15 +20,37 @@ namespace AOWebApp.Controllers
         }
 
         // GET: Items
-        public async Task<IActionResult> Index(string searchText)
+        public async Task<IActionResult> Index(string searchText, int? categoryId)
         {
+            #region CategoriesQuery
+            var categories = _context.ItemCategories
+            .Where(i => i.ParentCategoryId == null)
+            .OrderBy(i => i.CategoryName)
+            .Select(i => new
+            {
+                CategoryId = i.CategoryId,
+                CategoryName = i.CategoryName
+            })
+            .ToList();
+
+
+            ViewBag.CategoryList = new SelectList(categories, nameof(ItemCategory.CategoryId), nameof(ItemCategory.CategoryName));
+            #endregion
+            #region ItemQuery
             ViewBag.searchText = searchText;
             var amazonOrdersContext = _context.Items.Include(i => i.Category).OrderBy(i => i.ItemName).AsQueryable();
             ViewBag.maxNumberOfItems = _context.Items.Count();
+            
+
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 amazonOrdersContext = amazonOrdersContext.Where(i => i.ItemName.Contains(searchText));
             }
+            if (categoryId != null) 
+            {
+                amazonOrdersContext = amazonOrdersContext.Where(i => i.Category.ParentCategoryId == categoryId);
+            }
+            #endregion
             return View(await amazonOrdersContext.ToListAsync());
         }
 
