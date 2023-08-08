@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AOWebApp.Data;
 using AOWebApp.Models;
+using AOWebApp.ViewModels;
 
 namespace AOWebApp.Controllers
 {
@@ -20,7 +21,7 @@ namespace AOWebApp.Controllers
         }
 
         // GET: Items
-        public async Task<IActionResult> Index(string searchText, int? categoryId)
+        public async Task<IActionResult> Index(ItemSearchViewModel vm)
         {
             #region CategoriesQuery
             var categories = _context.ItemCategories
@@ -34,24 +35,23 @@ namespace AOWebApp.Controllers
             .ToList();
 
 
-            ViewBag.CategoryList = new SelectList(categories, nameof(ItemCategory.CategoryId), nameof(ItemCategory.CategoryName));
+            vm.CategoryList = new SelectList(categories, nameof(ItemCategory.CategoryId), nameof(ItemCategory.CategoryName));
             #endregion
             #region ItemQuery
-            ViewBag.searchText = searchText;
-            var amazonOrdersContext = _context.Items.Include(i => i.Category).OrderBy(i => i.ItemName).AsQueryable();
-            ViewBag.maxNumberOfItems = _context.Items.Count();
-            
 
-            if (!string.IsNullOrWhiteSpace(searchText))
+            var amazonOrdersContext = _context.Items.Include(i => i.Category).OrderBy(i => i.ItemName).AsQueryable();
+            //ViewBag.maxNumberOfItems = _context.Items.Count();
+            vm.Items = amazonOrdersContext.ToList();
+
+            if (!string.IsNullOrWhiteSpace(vm.SearchText))
             {
-                amazonOrdersContext = amazonOrdersContext.Where(i => i.ItemName.Contains(searchText));
+                amazonOrdersContext = amazonOrdersContext.Where(i => i.ItemName.Contains(vm.SearchText));
+                vm.SearchText = amazonOrdersContext.ToString();
             }
-            if (categoryId != null) 
-            {
-                amazonOrdersContext = amazonOrdersContext.Where(i => i.Category.ParentCategoryId == categoryId);
-            }
+          
+
             #endregion
-            return View(await amazonOrdersContext.ToListAsync());
+            return View(vm);
         }
 
         // GET: Items/Details/5
