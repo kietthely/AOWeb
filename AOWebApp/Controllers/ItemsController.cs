@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AOWebApp.Data;
 using AOWebApp.Models;
-using AOWebApp.ViewModels;
+using AOWebApp.Models.ViewModels;
+using AOWebApp.Helpers;
 
 namespace AOWebApp.Controllers
 {
@@ -21,8 +22,13 @@ namespace AOWebApp.Controllers
         }
 
         // GET: Items
-        public async Task<IActionResult> Index(ItemSearchViewModel vm)
+        public async Task<IActionResult> Index(ItemSearchViewModel vm, string SortOrder, int? PageNumber)
         {
+
+            if (!PageNumber.HasValue) { PageNumber = 1; }
+            ViewBag.SortOrder = SortOrder;
+            ViewBag.PageNumber = PageNumber;    
+
             #region CategoriesQuery
             var categories = _context.ItemCategories
             .Where(i => i.ParentCategoryId == null)
@@ -37,18 +43,48 @@ namespace AOWebApp.Controllers
 
             vm.CategoryList = new SelectList(categories, nameof(ItemCategory.CategoryId), nameof(ItemCategory.CategoryName));
             #endregion
+
+
             #region ItemQuery
 
-            var amazonOrdersContext = _context.Items.Include(i => i.Category).OrderBy(i => i.ItemName).AsQueryable();
-            //ViewBag.maxNumberOfItems = _context.Items.Count();
-            vm.Items = amazonOrdersContext.ToList();
-
+            var query = _context.Items.Include(i => i.Category).OrderBy(i => i.ItemName).AsQueryable();
+            switch (SortOrder) 
+            {
+                case "name_desc":
+                    query = query.OrderByDescending(p => p.ItemName);
+                    break;
+                case "price_asc":
+                    query = query.OrderBy(p => p.ItemCost);
+                    break;
+                case "price_desc":
+                    query = query.OrderByDescending(p => p.ItemCost);
+                    break;
+                default:
+                    query = query.OrderBy(p => p.ItemName);
+                    break;
+            }
             if (!string.IsNullOrWhiteSpace(vm.SearchText))
             {
-                amazonOrdersContext = amazonOrdersContext.Where(i => i.ItemName.Contains(vm.SearchText));
-                vm.SearchText = amazonOrdersContext.ToString();
+                query = query.Where(i => i.ItemName.Contains(vm.SearchText));
             }
-          
+            if (vm.CategoryId > 0)
+            {
+                query = query.Where(i => i.CategoryId == vm.CategoryId);
+            }
+
+            int PageSize = 3;
+            vm.ItemList = await PaginatedList<Item_ItemDetail>.CreateAsync(
+                query.Select(i => new Item_ItemDetail
+                {
+                    TheItem = i,
+                    ReviewCount = (i.Reviews != null ? i.Reviews.Count : 0),
+                    AverageRating = (i.Reviews != null && i.Reviews.Count() > 0 ? i.Reviews.Select(r => r.Rating ).Average() : 0)
+
+                }
+                ).AsNoTracking(), PageNumber ?? 1, PageSize);
+           
+           
+
 
             #endregion
             return View(vm);
