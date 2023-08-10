@@ -23,6 +23,7 @@ namespace AOWebApp.Controllers
         public async Task<IActionResult> Index(string customerSearch, string suburb)
         {
             List<Customer> customers = new List<Customer>();
+            #region CustomerSearch
             if (!string.IsNullOrWhiteSpace(customerSearch)) {
 
                 //var query = _context.Customers.Include(c => c.Address)
@@ -41,10 +42,25 @@ namespace AOWebApp.Controllers
                     Where(c => c.FirstName.StartsWith(customerSearch) && c.LastName.StartsWith(customerSearch))
                     .OrderBy(c => c.FirstName.StartsWith(customerSearch))
                     .ThenBy(c => c.LastName.StartsWith(customerSearch));
+
+                if (!string.IsNullOrEmpty(suburb))
+                
+                {
+                    query = _context.Customers.Include(c => c.Address).
+                    Where(c => c.FirstName.StartsWith(customerSearch) && c.LastName.StartsWith(customerSearch))
+                    .Where(c => c.Address.Suburb == suburb)
+                    .OrderBy(c => c.FirstName.StartsWith(customerSearch))
+                    .ThenBy(c => c.LastName.StartsWith(customerSearch));
+                }
                 customers = await query.ToListAsync();
 
             }
-
+            #endregion
+            #region SuburbSearch
+            var suburbQuery = _context.Addresses.Select(a => a.Suburb).Distinct().OrderBy(a => a).ToList();
+            
+            ViewBag.SuburbList = new SelectList(suburbQuery, suburb);
+            #endregion
             return View(customers);
         }
 
