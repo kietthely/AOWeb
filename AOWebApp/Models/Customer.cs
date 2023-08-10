@@ -25,7 +25,7 @@ namespace AOWebApp.Models
             {
                 var number = "";
                 if (!string.IsNullOrWhiteSpace(MainPhoneNumber)) { number = MainPhoneNumber; }
-                if (!string.IsNullOrWhiteSpace(SecondaryPhoneNumber)) { number += (ContactNumber.Length > 0 ? "<br />" : "") + SecondaryPhoneNumber; }
+                if (!string.IsNullOrWhiteSpace(SecondaryPhoneNumber)) { number += (number.Length > 0 ? "<br />" : "") + SecondaryPhoneNumber; }
                 return number;
             }
             
