@@ -1,8 +1,32 @@
-﻿@model AOWebApp.ViewModels.ItemSearchViewModel;
+﻿@model AOWebApp.Models.ViewModels.ItemSearchViewModel;
 
 
 @{
     ViewData["Title"] = "Index";
+}@{
+    var PrevDisabled = !Model.ItemList.HasPreviousPage ? "disabled" : "";
+    var NextDisabled = !Model.ItemList.HasNextPage ? "disabled" : "";
+
+}
+@functions {
+    public string ShortText(string text)
+    {
+        var truncatedDescription = text;
+        if (text.Length > 100)
+
+        {
+            truncatedDescription = text.Substring(0, 100) + "...";
+        }
+        return truncatedDescription;
+    }
+
+    public string isSelected(string value, string comp)
+    {
+        string selected = null;
+        if (value == comp) { selected = "selected"; }
+        return selected;
+    }
+
 }
 <div class="container">
     <div class="justify-content-center">
@@ -11,56 +35,89 @@
 </div>
 <form method="post" asp-controller="Items" asp-action="Index" >
     <div class="row align-items-center">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input asp-for="SearchText" class="form-control" placeholder="Search products..." />
         </div>
         <div class="col-md-3">
-            <select asp-for="CategoryId" class="form-control form-select" asp-items="@ViewBag.CategoryList">
+            <select asp-for="CategoryId" class="form-control form-select" asp-items="@Model.CategoryList">
                 <option selected value="">All Categories</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="SortOrder" class="form-control form-select">
+                <!option value="" @isSelected("name_desc", ViewBag.SortOrder)>Item Name [asc]</!option>
+                <!option value="name_desc" @isSelected("name_desc", ViewBag.SortOrder)>Item Name [desc]</!option>
+                <!option value="price_asc" @isSelected("price_asc", ViewBag.SortOrder)>Price [asc]</!option>
+                <!option value="price-desc" @isSelected("price_desc", ViewBag.SortOrder)>Price [desc]</!option>
             </select>
         </div>
         <div class="col-md-auto">
             <button type="submit" class="btn btn-outline-info btn-block">Search</button>
         </div>
-        <div class="col-md-auto">
+        <div class="col-md-auto m-2">
             <a class="btn btn-outline-info btn-block" asp-action="Create" asp-controller="Items">Create a new Item</a>
         </div>
+        
+    </div>
+
     </div>
 
 </form>
 
+        <div class="col-md-auto">
 
 
 <div class="container">
     <div class="row row-cols-3 row-cols-md-3 g-4">
-        @foreach (var item in Model.Items)
+        @foreach (var item in Model.ItemList)
         {
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">@item.ItemName</h5>
+                        <h5 class="card-title">@item.TheItem.ItemName</h5>
                         
-                        @{
-                            var truncatedDescription = item.ItemDescription;
-                            if (item.ItemDescription.Length > 100)
+
+                        @if (item.TheItem.Category != null)
+                        {
+                            <p class="card-text">Category: @Html.DisplayFor(modelItem => item.TheItem.Category.CategoryName)</p>
+                        }
+                        <p class="card-text">Description: @ShortText(item.TheItem.ItemDescription)</p>
+
+                        <p class="card-text">Cost: &#36 @Html.DisplayFor(modelItem => item.TheItem.ItemCost)</p>
+                        <p class="card-text">Rating: @if (item.ReviewCount > 0)
 
                             {
-                                truncatedDescription = item.ItemDescription.Substring(0, 100) + "...";
+                                <span>@item.AverageRating across @item.ReviewCount Reviews</span>
                             }
-                        }
-                        @if (item.Category != null)
-                        {
-                            <p class="card-text">Category: @item.Category.CategoryName</p>
-                        }
-                        <p class="card-text">Description: @truncatedDescription</p>
+                            else
+                            {
+                               <span>This item has not been reviewed</span> 
+                            }
+                        </p>
+                        <img src="@item.TheItem.ItemImage" class="card-img-bottom" alt="Item Image">
 
-                        <p class="card-text">Cost: &#36 @item.ItemCost</p>
-                        <img src="@item.ItemImage" class="card-img-bottom" alt="Item Image">
-
-                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ItemId" class="btn btn-outline-primary">View Item Details</a>
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.TheItem.ItemId" class="btn btn-outline-primary">View Item Details</a>
                     </div>
                 </div>
             </div>
         }
     </div>
+        <a asp-action="Index"
+           asp-route-SortOrder="@ViewBag.SortOrder"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-SearchText="@Model.SearchText"
+           asp-route-PageNumber="@(Model.ItemList.PageIndex - 1)"
+           class="m-2 btn btn-outline-primary @PrevDisabled">
+            Previous
+        </a>
+        <a asp-action="Index"
+           asp-route-SortOrder="@ViewBag.SortOrder"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-SearchText="@Model.SearchText"
+           asp-route-PageNumber="@(Model.ItemList.PageIndex+ 1)"
+           class="m-2 btn btn-outline-primary @NextDisabled">
+            Next
+        </a>
 </div>
+
+
