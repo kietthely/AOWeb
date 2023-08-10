@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Linq;
 
 namespace AOWebApp.Models
 {
@@ -10,7 +14,23 @@ namespace AOWebApp.Models
             CustomerOrders = new HashSet<CustomerOrder>();
             Reviews = new HashSet<Review>();
         }
-
+        [NotMapped]
+        [Display(Name = "Full Name")]
+        public  string FullName => FirstName + " " + LastName;
+        [NotMapped]
+        [Display(Name = "Contact Number")]
+        public string ContactNumber 
+        {
+            get
+            {
+                var number = "";
+                if (!string.IsNullOrWhiteSpace(MainPhoneNumber)) { number = MainPhoneNumber; }
+                if (!string.IsNullOrWhiteSpace(SecondaryPhoneNumber)) { number += (ContactNumber.Length > 0 ? "<br />" : "") + SecondaryPhoneNumber; }
+                return number;
+            }
+            
+            
+        }
         public int CustomerId { get; set; }
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
