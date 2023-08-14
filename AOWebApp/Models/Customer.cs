@@ -34,11 +34,13 @@ namespace AOWebApp.Models
         public int CustomerId { get; set; }
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
+        [Display(Name ="Email")]
         public string Email { get; set; } = null!;
         public string MainPhoneNumber { get; set; } = null!;
         public string? SecondaryPhoneNumber { get; set; }
         public int AddressId { get; set; }
 
+        [Display(Name ="Address")]
         public virtual Address Address { get; set; } = null!;
         public virtual ICollection<CustomerOrder> CustomerOrders { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
