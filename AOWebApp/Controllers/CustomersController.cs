@@ -21,57 +21,66 @@ namespace AOWebApp.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index(CustomerSearchViewModel cvm)
+        public async Task<IActionResult> Index(CustomerSearchViewModel vm)
         {
             #region SuburbSearch
-            var suburbQuery = _context.Addresses.Select(a => a.Suburb).Distinct().OrderBy(a => a).ToList();
-            ViewBag.SuburbList = new SelectList(suburbQuery, cvm.Suburb);
-            #endregion
-            List<Customer> CustomerList = new List<Customer>();
-            #region CustomerSearch
-            if (!string.IsNullOrWhiteSpace(cvm.SearchText)) {
-
-
-                if (!string.IsNullOrWhiteSpace(cvm.SearchText)) {
-                    var query = _context.Customers
-                        .Include(c => c.Address)
-                        .Where(c => cvm.SearchText.Split().Length > 1
-                        ? c.FirstName.Equals(cvm.SearchText.Split()[0]) && c.LastName.Equals(cvm.SearchText.Split()[1])
-                        : c.FirstName.StartsWith(cvm.SearchText) || c.LastName.StartsWith(cvm.SearchText));
-                    if (!string.IsNullOrWhiteSpace(cvm.Suburb))
-                    {
-                        query = query.Where(c => c.Address.Suburb == cvm.Suburb);
-
-                    }
-                    query = query.OrderBy(c => cvm.SearchText.Split().Length > 1
-                            ? c.FirstName.StartsWith(cvm.SearchText.Split()[0])
-                            : c.FirstName.StartsWith(cvm.SearchText))
-                        .ThenBy (c => cvm.SearchText.Split().Length > 1
-                            ? c.LastName.StartsWith(cvm.SearchText.Split()[1])
-                            : c.LastName.StartsWith(cvm.SearchText));
-                    cvm.CustomerList = await query.ToListAsync();
-                }
-
-                //var query = _context.Customers.Include(c => c.Address).
-                //    Where(c => c.FirstName.StartsWith(cvm.SearchText) && c.LastName.StartsWith(cvm.SearchText))
-                //    .OrderBy(c => c.FirstName.StartsWith(cvm.SearchText))
-                //    .ThenBy(c => c.LastName.StartsWith(cvm.SearchText));
-
-                //if (!string.IsNullOrEmpty(cvm.Suburb))
-                
-                //{
-                //    query = _context.Customers.Include(c => c.Address).
-                //    Where(c => c.FirstName.StartsWith(cvm.SearchText) && c.LastName.StartsWith(cvm.SearchText))
-                //    .Where(c => c.Address.Suburb == cvm.Suburb)
-                //    .OrderBy(c => c.FirstName.StartsWith(cvm.SearchText))
-                //    .ThenBy(c => c.LastName.StartsWith(cvm.SearchText));
-                //}
-                //cvm.CustomerList = await query.ToListAsync();
-
-            }
+            var suburbQuery = _context.Addresses
+                .Select(a => a.Suburb)
+                .Distinct()
+                .OrderBy(a => a)
+                .ToList();
+            ViewBag.SuburbList = new SelectList(suburbQuery, vm.Suburb);
             #endregion
             
-            return View(cvm);
+            List<Customer> CustomerList = new List<Customer>();
+            #region CustomerSearch
+
+
+            if (!string.IsNullOrWhiteSpace(vm.SearchText))
+            {
+                var query = _context.Customers
+                    .Include(c => c.Address)
+                    .Where(c => vm.SearchText.Split().Length > 1
+                    ? c.FirstName.Equals(vm.SearchText.Split()[0]) && c.LastName.Equals(vm.SearchText.Split()[1])
+                    : c.FirstName.StartsWith(vm.SearchText) || c.LastName.StartsWith(vm.SearchText));
+                if (!string.IsNullOrWhiteSpace(vm.Suburb))
+                {
+                    query = query.Where(c => c.Address.Suburb == vm.Suburb);
+
+                }
+                query = query.OrderBy(c => vm.SearchText.Split().Length > 1
+                        ? c.FirstName.StartsWith(vm.SearchText.Split()[0])
+                        : c.FirstName.StartsWith(vm.SearchText))
+                    .ThenBy(c => vm.SearchText.Split().Length > 1
+                        ? c.LastName.StartsWith(vm.SearchText.Split()[1])
+                        : c.LastName.StartsWith(vm.SearchText));
+                vm.CustomerList = await query.ToListAsync();
+            }
+            else {
+                var query = _context.Customers.Include(c => c.Address);
+                vm.CustomerList = await query.ToListAsync();
+            }
+
+            //var query = _context.Customers.Include(c => c.Address).
+            //    Where(c => c.FirstName.StartsWith(vm.SearchText) && c.LastName.StartsWith(vm.SearchText))
+            //    .OrderBy(c => c.FirstName.StartsWith(vm.SearchText))
+            //    .ThenBy(c => c.LastName.StartsWith(vm.SearchText));
+
+            //if (!string.IsNullOrEmpty(vm.Suburb))
+
+            //{
+            //    query = _context.Customers.Include(c => c.Address).
+            //    Where(c => c.FirstName.StartsWith(vm.SearchText) && c.LastName.StartsWith(vm.SearchText))
+            //    .Where(c => c.Address.Suburb == vm.Suburb)
+            //    .OrderBy(c => c.FirstName.StartsWith(vm.SearchText))
+            //    .ThenBy(c => c.LastName.StartsWith(vm.SearchText));
+            //}
+            //vm.CustomerList = await query.ToListAsync();
+
+
+            #endregion
+
+            return View(vm);
         }
 
         // GET: Customers/Details/5
