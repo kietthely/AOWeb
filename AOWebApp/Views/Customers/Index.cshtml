@@ -10,11 +10,11 @@
 <form method="post" asp-action="Index" asp-controller="Customers">
     <div class="row align-items-center">
         <div class="col-md-3">
-            <input type="text" asp-for="SearchText" class="form-control" title="Search customers by Name" placeholder="Customer name..." />
+            <input type="text" asp-for="SearchText" value="@Model.SearchText" class="form-control" title="Search customers by Name" placeholder="Customer name..." />
         </div>
         <div class="col-md-3">
 
-            <select asp-for="Suburb" class="form-select form-control" asp-items="Model.SuburbList">
+            <select asp-for="Suburb" class="form-select form-control" asp-items="ViewBag.SuburbList">
                 <option value="" selected>All suburbs</option>
             </select>
         </div>
@@ -44,33 +44,34 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.CustomerList) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ContactNumber)
-            </td>
-            <td>
-                    @if (item.Address != null)
-                    {
-                        @item.Address.AddressLine <br />
-                        <span>@item.Address.Suburb,</span>
-                        <span>@item.Address.Postcode,</span>
-                        <span>@item.Address.Region]</span>
-                    }
+        @foreach (var item in Model.CustomerList) 
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
                 </td>
-            <td>
-                <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.CustomerId">Edit</a> |
-                    <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@item.CustomerId">Details</a> |
-                    <a class="btn btn-outline-primary" asp-action="Delete" asp-route-id="@item.CustomerId">Delete</a>
-            </td>
-        </tr>
-}
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactNumber)
+                </td>
+                <td>
+                        @if (item.Address != null)
+                        {
+                            @item.Address.AddressLine <br />
+                            <span>@item.Address.Suburb,</span>
+                            <span>@item.Address.Postcode,</span>
+                            <span>@item.Address.Region</span>
+                        }
+                    </td>
+                <td>
+                    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.CustomerId">Edit</a> |
+                        <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@item.CustomerId">Details</a> |
+                        <a class="btn btn-outline-primary" asp-action="Delete" asp-route-id="@item.CustomerId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
