@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AOWebApp.Models.Customer>
+﻿@model AOWebApp.Models.ViewModels.CustomerSearchViewModel;
 
 @{
     ViewData["Title"] = "Index";
@@ -10,11 +10,11 @@
 <form method="post" asp-action="Index" asp-controller="Customers">
     <div class="row align-items-center">
         <div class="col-md-3">
-            <input name="customerSearch" value="" placeholder="Customer name..." />
+            <input type="text" asp-for="SearchText" class="form-control" title="Search customers by Name" placeholder="Customer name..." />
         </div>
         <div class="col-md-3">
 
-            <select name="suburb" class="form-select form-control" asp-items="@ViewBag.SuburbList">
+            <select asp-for="Suburb" class="form-select form-control" asp-items="Model.SuburbList">
                 <option value="" selected>All suburbs</option>
             </select>
         </div>
@@ -27,24 +27,24 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FullName)
+                @Html.DisplayNameFor(model => model.CustomerList[0].FullName)
             </th>
 
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.CustomerList[0].Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ContactNumber)
+                @Html.DisplayNameFor(model => model.CustomerList[0].ContactNumber)
             </th>
 
             <th>
-                @Html.DisplayNameFor(model => model.Address)
+                @Html.DisplayNameFor(model => model.CustomerList[0].Address)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.CustomerList) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.FullName)
@@ -57,8 +57,14 @@
                 @Html.DisplayFor(modelItem => item.ContactNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Address.AddressId)
-            </td>
+                    @if (item.Address != null)
+                    {
+                        @item.Address.AddressLine <br />
+                        <span>@item.Address.Suburb,</span>
+                        <span>@item.Address.Postcode,</span>
+                        <span>@item.Address.Region]</span>
+                    }
+                </td>
             <td>
                 <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.CustomerId">Edit</a> |
                     <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@item.CustomerId">Details</a> |
