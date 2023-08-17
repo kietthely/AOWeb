@@ -22,7 +22,7 @@
                 </select>
             </div>
             <div class="col">
-                <button type="button" id="searchButton">Search</button>
+                <button type="button" id="searchButton" class="btn btn-outline-info">Search</button>
             </div>
 
         </div>
@@ -69,11 +69,18 @@
                     var searchElement = document.querySelector('input[name="searchText"]');
                     var searchValue = searchElement.value;
                     let searchData = data.filter(item => item.itemName.includes(searchValue));
+                    var row = document.querySelector(".row.justify-content-center");
+                    var hid = row.querySelectorAll("div:not([hidden])");
+                    hid.forEach(card => card.remove());
+
                     buildItems(searchData);
 
                 }
                 )
                 .catch(error => console.error("Unable to get items: ", error));
+            
+
+
         }
 
         function buildItems(data) {
@@ -85,7 +92,7 @@
             //var nonHiddenCards = test.querySelector("not:([hidden])");
             // Remove all existing cards
             //nonHiddenCards.forEach(card => card.remove());
-            
+
             //var firstCard = row.querySelector("div.col-4");
 
             //// hidden attribute
@@ -105,8 +112,6 @@
                 img.setAttribute("alt", "image of " + data[i].itemName)
 
                 row.appendChild(col);
-
-
 
                 if (i == (data.length - 1)) {
                     var firstCard = row.querySelector("div.col-4");
