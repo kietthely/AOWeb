@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, inital-scale=1"/>
+    <link href="lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
+    <title>Shop Items</title>
+</head>
+<body>
+
+
+    <div class="container">
+        <h1 class="alert-secondary p-2 text-center" mb-3>Shop Items</h1>
+        <div class="row mb-3">
+            <div class="col-3">
+                <input type="text" name="searchText" class="form-control" placeholder="Product name..." value="" />\
+
+            </div>
+            <div class="col-3">
+                <select name="categoryId" class="form-control">
+                    <option value="">All categories</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="button">Search</button>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-4 mb-2">
+                <div class="card">
+                    <img src="..." class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">Card Text</p>
+                        <p class="card-text">Price</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        //document.addEventListener("click", function () {
+        //    fetch('/api/ItemsWebAPI')
+        //        .then((response) => response.json())
+        //        .then(data => buildItems(data))
+        //        .catch(error => console.error("Unable to get items: ", error));
+        //    var searchInput = document.querySelector("input[name="searchText"]");
+        //    var searchValue = searchInput.value;
+
+        //}, false)
+        function buildItems(data) {
+            var row = document.querySelector(".row");
+            for (let i = 0; i < data.length; i++) {
+                var col = row.querySelector("div.col-4").cloneNode(true);
+
+                col.querySelector("h5").innerText = data[i].itemName;
+                let cardTextList = col.querySelectorAll("p");
+                cardTextList[0].innerText = data[i].itemDescription;
+                cardTextList[1].innerText = data[i].itemCost;
+
+                let img = col.querySelector("img");
+                img.setAttribute("src", data[i].itemImage)
+                img.setAttribute("alt", "image of " + data[i].itemName)
+
+                row.appendChild(col);
+                if (i == (data.length - 1)) {
+                    var firstCard = row.querySelector("div.col-4");
+                    // hidden attribute
+                    firstCard.setAttribute("hidden", true);
+
+                }
+            }
+        }
+        
+        fetch('/api/ItemsWebAPI')
+            .then((response) => response.json())
+            .then(data => buildItems(data))
+            .catch(error => console.error("Unable to get items: ", error));
+            
+    </script>
+</body>
+</html>
