@@ -69,12 +69,19 @@
                     var searchElement = document.querySelector('input[name="searchText"]');
                     var searchValue = searchElement.value;
                     let searchData = data.filter(item => item.itemName.includes(searchValue));
+
+
                     var row = document.querySelector(".row.justify-content-center");
-                    var hid = row.querySelectorAll("div:not([hidden])");
+                    var hid = row.querySelectorAll("div.col-4:not([hidden])");
+
+                    var firstCard = row.querySelector("div.col-4");
+                    //remove all non hidden cards
                     hid.forEach(card => card.remove());
-
-                    buildItems(searchData);
-
+                    // original card visible
+                    // hidden attribute
+                    firstCard.setAttribute("hidden", false);
+                    //buildItems(searchData);
+                    
                 }
                 )
                 .catch(error => console.error("Unable to get items: ", error));
@@ -85,18 +92,7 @@
 
         function buildItems(data) {
             var row = document.querySelector(".row.justify-content-center");
-            // select all cards
-            //var test = document.querySelectorAll("div.col-4 [hidden]");
-            // select all not hidden cards from a list of cards
-            //test.forEach(card => card.remove())
-            //var nonHiddenCards = test.querySelector("not:([hidden])");
-            // Remove all existing cards
-            //nonHiddenCards.forEach(card => card.remove());
 
-            //var firstCard = row.querySelector("div.col-4");
-
-            //// hidden attribute
-            //firstCard.setAttribute("hidden", false);
             for (let i = 0; i < data.length; i++) {
 
                 var col = row.querySelector("div.col-4").cloneNode(true);
