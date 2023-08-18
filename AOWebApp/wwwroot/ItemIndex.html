@@ -68,12 +68,19 @@
             var searchInputElement = document.querySelector('input[name="searchText"]');
             var searchValue = searchInputElement.value;
             var searchText = searchValue;
-            // Hard coded query for testing
-            var searchText = "";
-            //var category = "25";
-            var mquery = `/api/ItemsWebAPI?searchText=${searchText}`;
+
+            var query = `/api/ItemsWebAPI?searchText=${searchText}`;
+            // Remove existing cards
+            var row = document.querySelector(".row.justify-content-center");
+            var existingCards = row.querySelectorAll("div.col-4");
+            existingCards.forEach(card => {
+                // Except hidden cards
+                if (!card.hasAttribute("hidden")) {
+                    card.remove();
+                }
+            });
             originalCardTemplate.removeAttribute("hidden");
-            displayItems(mquery);
+            displayItems(query);
         }
         
         var queryUrl = `/api/ItemsWebAPI`;
