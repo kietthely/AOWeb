@@ -43,7 +43,6 @@
         </div>
 
     </div>
-
     <script>
         // Keep the origional card template
         var originalCardTemplate = document.querySelector(".row.justify-content-center div.col-4");
@@ -63,6 +62,10 @@
                     select.appendChild(opt);
                 })
             })
+        var allItemsQuery = `/api/ItemsWebAPI`;
+        // Initial fetch to populate cards
+        displayItems(allItemsQuery)
+
         // Add the event listener to the search button
         function searchEvent() {
             var searchInputElement = document.querySelector('input[name="searchText"]');
@@ -82,17 +85,14 @@
             originalCardTemplate.removeAttribute("hidden");
             displayItems(query);
         }
-        
-        var queryUrl = `/api/ItemsWebAPI`;
-
-        // Initial fetch to populate cards
-        displayItems(queryUrl)
 
         // Function to build cards from fetched data
         function buildItems(data) {
             var row = document.querySelector(".row.justify-content-center");
             data.forEach(item => {
+                // Clone the template card
                 var col = originalCardTemplate.cloneNode(true);
+                // Add details
                 col.querySelector("h5").innerText = item.itemName;
                 let cardList = col.querySelectorAll("p");
                 cardList[0].innerText = "Category: " + item.categoryId;
@@ -101,10 +101,13 @@
                 let img = col.querySelector("img");
                 img.setAttribute("src", item.itemImage)
                 img.setAttribute("alt", "image of " + item.itemName)
+                // Add cloned cards to the row
                 row.appendChild(col);
             });
+            // Hide the template card
             originalCardTemplate.setAttribute("hidden", true);
         }
+        // Fetch data based on the query
         function displayItems(queryUrl) {
             fetch(queryUrl)
                 .then((response) => response.json())
