@@ -17,7 +17,7 @@
 
             </div>
             <div class="col-3">
-                <select name="categoryId" class="form-control">
+                <select name="categoryId" class="form-control category">
                     <option value="">All categories</option>
                 </select>
             </div>
@@ -68,11 +68,21 @@
 
         // Add the event listener to the search button
         function searchEvent() {
-            var searchInputElement = document.querySelector('input[name="searchText"]');
-            var searchValue = searchInputElement.value;
-            var searchText = searchValue;
+            let searchInputElement = document.querySelector('input[name="searchText"]');
+            let searchValue = searchInputElement.value;
+            let searchText = searchValue;
 
-            var query = `/api/ItemsWebAPI?searchText=${searchText}`;
+            let searchQuery = '/api/ItemsWebAPI?';
+            let categoryId = document.getElementsByClassName('category')[0].value;
+
+            if (categoryId) {
+                searchQuery += `category=${categoryId}`;
+            }
+
+            if (searchText) {
+                searchQuery += `&searchText=${searchText}`;
+            }
+
             // Remove existing cards
             var row = document.querySelector(".row.justify-content-center");
             var existingCards = row.querySelectorAll("div.col-4");
@@ -83,7 +93,7 @@
                 }
             });
             originalCardTemplate.removeAttribute("hidden");
-            displayItems(query);
+            displayItems(searchQuery);
         }
 
         // Function to build cards from fetched data
