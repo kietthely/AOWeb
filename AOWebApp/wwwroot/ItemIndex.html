@@ -34,6 +34,7 @@
                     <img src="..." class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Card title</h5>
+                        <p class="card-text">Card category</p>
                         <p class="card-text">Card Text</p>
                         <p class="card-text">Price</p>
                     </div>
@@ -44,85 +45,56 @@
     </div>
 
     <script>
-
-        //function categoryList() {
-        //    fetch('/api/ParentCategoriesWebAPI')
-        //        .then((response) => response.json())
-        //        .then(data =>
-        //        {
-        //            let select = document.querySelector('select[name="categoryId"]');
-        //            data.forEach(c => {
-        //                let opt = document.createElement("option");
-        //                opt.value = c.categoryId;
-        //                opt.innerText = c.categoryName;
-        //                select.appendChild(opt);
-        //            });
-        //        });
-        //}
+        var originalCardTemplate = document.querySelector(".row.justify-content-center div.col-4");
         var buttonRef = document.getElementById("searchButton");
-            buttonRef.addEventListener("click", searchEvent, false);
-        
+        buttonRef.addEventListener("click", searchEvent, false);
+        // Fetch the category list
+        fetch('/api/ParentCategoriesWebAPI')
+            .then((response) => response.json())
+            .then(data => {
+                let select = document.querySelector('select[name="categoryId"]');
+                data.forEach(c => {
+                    let opt = document.createElement("option");
+                    opt.value = c.categoryId;
+                    opt.innerText = c.categoryName;
+                    select.appendChild(opt);
+                })
+            })
+        // Add the event listener to the search button
         function searchEvent() {
-            fetch('/api/ItemsWebAPI')
+            var mquery = `/api/ItemsWebAPI?searchText=${encodeURIComponent(searchText)}`;
+            originalCardTemplate.removeAttribute("hidden");
+            fetch(mquery)
                 .then((response) => response.json())
-                .then(data => {
-                    var searchElement = document.querySelector('input[name="searchText"]');
-                    var searchValue = searchElement.value;
-                    let searchData = data.filter(item => item.itemName.includes(searchValue));
-
-
-                    var row = document.querySelector(".row.justify-content-center");
-                    var hid = row.querySelectorAll("div.col-4:not([hidden])");
-
-                    var firstCard = row.querySelector("div.col-4");
-                    //remove all non hidden cards
-                    hid.forEach(card => card.remove());
-                    // original card visible
-                    // hidden attribute
-                    firstCard.setAttribute("hidden", false);
-                    //buildItems(searchData);
-                    
-                }
-                )
+                .then(data => buildItems(data))
                 .catch(error => console.error("Unable to get items: ", error));
-            
-
-
         }
+        var searchText = "air";
+        var queryUrl = `/api/ItemsWebAPI?searchText=${encodeURIComponent(searchText)}`;
 
-        function buildItems(data) {
-            var row = document.querySelector(".row.justify-content-center");
-
-            for (let i = 0; i < data.length; i++) {
-
-                var col = row.querySelector("div.col-4").cloneNode(true);
-
-                col.querySelector("h5").innerText = data[i].itemName;
-                let cardTextList = col.querySelectorAll("p");
-                cardTextList[0].innerText = data[i].itemDescription;
-                cardTextList[1].innerText = data[i].itemCost;
-
-                let img = col.querySelector("img");
-                img.setAttribute("src", data[i].itemImage)
-
-                img.setAttribute("alt", "image of " + data[i].itemName)
-
-                row.appendChild(col);
-
-                if (i == (data.length - 1)) {
-                    var firstCard = row.querySelector("div.col-4");
-                    // hidden attribute
-                    firstCard.setAttribute("hidden", true);
-
-                }
-            }
-        }
-
-        fetch('/api/ItemsWebAPI')
+        // Initial fetch to populate cards
+        fetch(queryUrl)
             .then((response) => response.json())
             .then(data => buildItems(data))
             .catch(error => console.error("Unable to get items: ", error));
 
+        // Function to build cards from fetched data
+        function buildItems(data) {
+            var row = document.querySelector(".row.justify-content-center");
+            data.forEach(item => {
+                var col = originalCardTemplate.cloneNode(true);
+                col.querySelector("h5").innerText = item.itemName;
+                let cardList = col.querySelectorAll("p");
+                cardList[0].innerText = "Category: " + item.categoryId;
+                cardList[1].innerText = "Description: " + item.itemDescription;
+                cardList[2].innerText = "Cost: " + item.itemCost;
+                let img = col.querySelector("img");
+                img.setAttribute("src", item.itemImage)
+                img.setAttribute("alt", "image of " + item.itemName)
+                row.appendChild(col);
+            });
+            originalCardTemplate.setAttribute("hidden", true);
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </body>
