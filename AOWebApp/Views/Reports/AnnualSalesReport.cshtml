@@ -1,0 +1,35 @@
+﻿@model SelectList;
+@{
+    ViewBag.Title = "Annual Sales";
+}
+<h2 class="text-center">Annual Sales Report</h2>
+<h3>Date</h3>
+<div class="row mb-3">
+    <div class="col-3">
+        <select name="year" asp-items="@Model" class="form-control year">
+            <option selected value="">Select..</option>
+        </select>
+    </div> 
+</div>
+<div>
+    <svg id="graph" width="100%" height="600px" class="border border-primary rounded p-2"></svg>
+</div>
+@section scripts{
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+        
+    const svg = d3.select('#graph');
+    let w = svg.node().getBoundingClientRect().width;
+
+    let h = svg.node().getBoundingClientRect().height;
+        console.log("width" + w);
+        console.log("height" + h);
+    const selectElement = document.querySelector(".year");
+        selectElement.addEventListener("change", (event) => {
+            if(event.target.value != null)
+            {
+                fetch()
+            }
+    })
+</script>
+}
