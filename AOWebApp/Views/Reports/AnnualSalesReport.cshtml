@@ -26,7 +26,18 @@
 
     let h = svg.node().getBoundingClientRect().height;
 
+    // change the margin of the chart
+    const chartMargins = 
+    {
+        left: 40,
+        right: 25,
+        top: 25,
+        bottom: 80
+    }
+    w = w - (chartMargins.left + chartMargins.right);
+    h = h - (chartMargins.top + chartMargins.bottom);
 
+    //fetch data
     document.querySelector('.row .col-2 [name="year"]').addEventListener("change", (event) => {
             let year = event.target.value;
             console.log("Year: " + event.target.value);
@@ -44,27 +55,36 @@
                 
             }
     })
-        
+        // building the graph
         function buildGraph(dataSet) {
-
+            // get the range of items
             let totalItemsRange = d3.extent(dataSet, (d, i) => d.totalItems);
-
             let maxTotalItems = totalItemsRange[1];
+         
 
-            const barMargin = 10;
+            //dynamic scale
+            let yScale = d3.scaleLinear().domain([0,maxTotalItems]).range([h,0]);
 
-            const barWidth = w / dataSet.length;
+            let monthArray = Array.from(dataSet, (d,i) => d.monthName);
+            console.log('Array: ' + monthArray);
+            let xScale = d3.scaleBand().domain(monthArray).range([0,w]).paddingInner(0.1);
+            console.log('xScale: ' + xScale('March'));
+            // get all columns
+            const chartGroup = svg.append('g').classed('chartGroup', true).attr('transform', `translate(${chartMargins.left}, ${chartMargins.top})`);
+            let barGroups = chartGroup.selectAll('g').data(dataSet);
 
-            let barGroups = svg.selectAll('g').data(dataSet);
-            console.log("barGroups: " + barGroups);
+            // chart styling
             let newBarGroups = barGroups.enter()
                 .append('g').attr('transform', (d, i) => {
-                    return `translate(${i * barWidth}, ${h - (d.totalItems / maxTotalItems) * h})`;
+                    return `translate(${xScale(d.monthName)}, ${yScale(d.totalItems)})`;
                 });
             newBarGroups.append('rect').attr('x', 0)
-                .attr('height', (d, i) => { return d.totalItems / maxTotalItems * h; })
-                .attr('width', barWidth - barMargin)
+                .attr('height', (d, i) => { return h - yScale(d.totalItems); })
+                .attr('width', xScale.bandwidth())
                 .attr('fill', 'black');
+            // y axis
+            let yAxis = d3.axisLeft(yScale);
+            chartGroup.append('g').classed('axis y', true).call(yAxis);
         }
     </script>
 }
