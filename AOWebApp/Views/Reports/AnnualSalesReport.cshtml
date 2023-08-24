@@ -25,8 +25,7 @@
     let w = svg.node().getBoundingClientRect().width;
 
     let h = svg.node().getBoundingClientRect().height;
-    console.log("width" + w);
-    console.log("height" + h);
+
 
     document.querySelector('.row .col-2 [name="year"]').addEventListener("change", (event) => {
             let year = event.target.value;
@@ -47,16 +46,17 @@
     })
         
         function buildGraph(dataSet) {
-            console.log("data: " + dataSet);
+
             let totalItemsRange = d3.extent(dataSet, (d, i) => d.totalItems);
-            console.log("totalItemsRange: " + totalItemsRange);
+
             let maxTotalItems = totalItemsRange[1];
-            console.log("Max totalItems: " + maxTotalItems);
+
             const barMargin = 10;
-            console.log('w: ' + w)
+
             const barWidth = w / dataSet.length;
 
-            let barGroups = chartGroup.selectAll('g').data(dataSet);
+            let barGroups = svg.selectAll('g').data(dataSet);
+            console.log("barGroups: " + barGroups);
             let newBarGroups = barGroups.enter()
                 .append('g').attr('transform', (d, i) => {
                     return `translate(${i * barWidth}, ${h - (d.totalItems / maxTotalItems) * h})`;
