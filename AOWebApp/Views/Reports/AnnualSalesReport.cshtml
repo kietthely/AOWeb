@@ -78,13 +78,31 @@
                 .append('g').attr('transform', (d, i) => {
                     return `translate(${xScale(d.monthName)}, ${yScale(d.totalItems)})`;
                 });
-            newBarGroups.append('rect').attr('x', 0)
+            newBarGroups.append('rect').attr('x',0)
                 .attr('height', (d, i) => { return h - yScale(d.totalItems); })
                 .attr('width', xScale.bandwidth())
                 .attr('fill', 'black');
+            // texts inside the column
+            newBarGroups.append('text').attr('text-anchor', 'middle')
+            .attr('x', (d,i) => {return xScale.bandwidth()/ 2;})
+            .attr('y', 40)
+            .attr('fill', 'white')
+            .style('font-size', '1em')
+            .text((d,i) => d.totalItems.toLocaleString());
+
             // y axis
             let yAxis = d3.axisLeft(yScale);
             chartGroup.append('g').classed('axis y', true).call(yAxis);
+            chartGroup
+            .selectAll('text')
+            .attr('transform', 'rotate(-70)')
+            .attr('dx', '-0.8em')
+            .attr('dy', '0.25em')
+            .style('text-anchor','end')
+            .style('font-size', '0.9em');
+            // x axis
+            let xAxis = d3.axisBottom(xScale);
+            chartGroup.append('g').attr('transform',`translate(0,${h})`).classed('axis x', true).call(xAxis);
         }
     </script>
 }
