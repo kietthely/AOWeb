@@ -36,10 +36,11 @@
     }
     w = w - (chartMargins.left + chartMargins.right);
     h = h - (chartMargins.top + chartMargins.bottom);
-
+    let chartGroup;
     //fetch data
     document.querySelector('.row .col-2 [name="year"]').addEventListener("change", (event) => {
             let year = event.target.value;
+            cleanUpGraph();
             console.log("Year: " + event.target.value);
             if(year.length > 0 )
             {
@@ -55,6 +56,10 @@
                 
             }
     })
+    function cleanUpGraph(){
+        if(chartGroup){
+        chartGroup.remove();}
+    }
         // building the graph
         function buildGraph(dataSet) {
             // get the range of items
@@ -70,7 +75,7 @@
             let xScale = d3.scaleBand().domain(monthArray).range([0,w]).paddingInner(0.1);
             console.log('xScale: ' + xScale('March'));
             // get all columns
-            const chartGroup = svg.append('g').classed('chartGroup', true).attr('transform', `translate(${chartMargins.left}, ${chartMargins.top})`);
+            chartGroup = svg.append('g').classed('chartGroup', true).attr('transform', `translate(${chartMargins.left}, ${chartMargins.top})`);
             let barGroups = chartGroup.selectAll('g').data(dataSet);
 
             // chart styling
@@ -81,18 +86,20 @@
             newBarGroups
                 .append('rect')
                 .attr('x',0)
-                .attr('height', (d, i) => { return h - yScale(d.totalItems); })
+                //.attr('height', 0)
+                //.attr('y', (d, i) => { return h - yScale(d.totalItems); })
                 .attr('width', xScale.bandwidth())
                 //.style('fill', 'transparent')
+                .transition().duration((d,i) => i*500)
+                .delay((d, i) => i + 200)
+                //.attr()
                 //.attr('y', 0)
-                //.attr('y', (d, i) => { return h - yScale(d.totalItems); })
-                //.transition().duration((d,i) => i*5)
-                //.delay((d,i) => i + 10)
-                .attr('fill', (d,i)=>{return `rgb(20,20,$(i * 15+ 80))`});
+                .attr('height', (d, i) => { return h - yScale(d.totalItems); })
+                .attr('fill', (d,i)=>{return `rgb(20,20,${(i * 15 + 80)}`});
             // texts inside the column
             newBarGroups.append('text').attr('text-anchor', 'middle')
             .attr('x', (d,i) => {return xScale.bandwidth()/ 2;})
-            .attr('y', 60)
+            .attr('y', 20)
             .attr('fill', 'white')
             .style('font-size', '1em')
             .text((d,i) => d.totalItems.toLocaleString());
@@ -100,16 +107,20 @@
             // y axis
             let yAxis = d3.axisLeft(yScale);
             chartGroup.append('g').classed('axis y', true).call(yAxis);
-            chartGroup
-            .selectAll('text')
-            .attr('transform', 'rotate(-70)')
-            .attr('dx', '-0.8em')
-            .attr('dy', '0.25em')
-            .style('text-anchor','end')
-            .style('font-size', '0.9em');
+            //chartGroup
+            //.selectAll('text')
+            //
+            //.attr('dx', '-0.8em')
+            //.attr('dy', '0.25em')
+            //.style('text-anchor','end')
+            //.style('font-size', '0.9em');
             // x axis
             let xAxis = d3.axisBottom(xScale);
-            chartGroup.append('g').attr('transform',`translate(0,${h})`).classed('axis x', true).call(xAxis);
+            chartGroup
+            .append('g')
+            .attr('transform',`translate(0,${h})`)
+            .classed('axis x', true)
+            .call(xAxis);
         }
     </script>
 }
