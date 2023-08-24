@@ -2,10 +2,11 @@
 @{
     ViewBag.Title = "Annual Sales";
 }
-<h2 class="text-center">Annual Sales Report</h2>
-<h3>Date</h3>
+<div class="bg-light py-2 mb-2">
+    <h2 class="text-center">Annual Sales Report</h2>
+</div>
 <div class="row mb-3">
-    <div class="col-3">
+    <div class="col-2">
         <select name="year" asp-items="@Model" class="form-control year">
             <option selected value="">Select..</option>
         </select>
@@ -17,19 +18,53 @@
 @section scripts{
 <script type="module">
     import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-        
-    const svg = d3.select('#graph');
+    
+
+
+    const svg = d3.select('svg');
     let w = svg.node().getBoundingClientRect().width;
 
     let h = svg.node().getBoundingClientRect().height;
-        console.log("width" + w);
-        console.log("height" + h);
-    const selectElement = document.querySelector(".year");
-        selectElement.addEventListener("change", (event) => {
-            if(event.target.value != null)
+    console.log("width" + w);
+    console.log("height" + h);
+
+    document.querySelector('.row .col-2 [name="year"]').addEventListener("change", (event) => {
+            let year = event.target.value;
+            console.log("Year: " + event.target.value);
+            if(year.length > 0 )
             {
-                fetch()
+                fetch(`/Reports/AnnualSalesReportData?year=${year}`)
+                .then(response => {
+                console.log("status" + response.status);
+                console.log("text" + response.statusText);
+                return response.json();
+                })
+                .then(data => buildGraph(data))
+                .catch(error => console.log(error.message));
+                    
+                
             }
     })
-</script>
+        
+        function buildGraph(dataSet) {
+            console.log("data: " + dataSet);
+            let totalItemsRange = d3.extent(dataSet, (d, i) => d.totalItems);
+            console.log("totalItemsRange: " + totalItemsRange);
+            let maxTotalItems = totalItemsRange[1];
+            console.log("Max totalItems: " + maxTotalItems);
+            const barMargin = 10;
+            console.log('w: ' + w)
+            const barWidth = w / dataSet.length;
+
+            let barGroups = chartGroup.selectAll('g').data(dataSet);
+            let newBarGroups = barGroups.enter()
+                .append('g').attr('transform', (d, i) => {
+                    return `translate(${i * barWidth}, ${h - (d.totalItems / maxTotalItems) * h})`;
+                });
+            newBarGroups.append('rect').attr('x', 0)
+                .attr('height', (d, i) => { return d.totalItems / maxTotalItems * h; })
+                .attr('width', barWidth - barMargin)
+                .attr('fill', 'black');
+        }
+    </script>
 }
