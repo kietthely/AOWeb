@@ -16,7 +16,7 @@ namespace AOWebApp.Controllers
         }
         public IActionResult Index()
         {
-            var yearList = _context.CustomerOrders.Select(co => co.OrderDate.Year).OrderByDescending(co=> co).Distinct().ToList();
+            var yearList = _context.CustomerOrders.Select(co => co.OrderDate.Year).Distinct().OrderByDescending(co=> co).ToList();
 
 
 
@@ -27,17 +27,18 @@ namespace AOWebApp.Controllers
         public IActionResult AnnualSalesReportData(int Year)
         {
             if (Year > 0) {
-                var order = _context.ItemsInOrders.Where(iio => iio.OrderNumberNavigation.OrderDate.Year == Year)
+                var order = _context.ItemsInOrders
+                    .Where(iio => iio.OrderNumberNavigation.OrderDate.Year == Year)
                 .GroupBy(iio => new { iio.OrderNumberNavigation.OrderDate.Year, iio.OrderNumberNavigation.OrderDate.Month })
-                .Select(obj => new
+                .Select(group => new
                 {
-                    year = obj.Key.Year,
-                    month = obj.Key.Month,
-                    monthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(obj.Key.Month),
-                    totalItems = obj.Sum(iio => iio.NumberOf),
-                    totalCost = obj.Sum(iio => iio.TotalItemCost)
+                    year = group.Key.Year,
+                    monthNo = group.Key.Month,
+                    monthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(group.Key.Month),
+                    totalItems = group.Sum(iio => iio.NumberOf),
+                    totalCost = group.Sum(iio => iio.TotalItemCost)
 
-                }).OrderBy(d => d.month);
+                }).OrderBy(d => d.monthNo);
                 // OR
                 //var summaryQuery = _context.ItemsInOrders.Where(iio => iio.OrderNumberNavigation.OrderDate.Year == Year)
                 //.GroupBy(iio => new { iio.OrderNumberNavigation.OrderDate.Year, iio.OrderNumberNavigation.OrderDate.Month })

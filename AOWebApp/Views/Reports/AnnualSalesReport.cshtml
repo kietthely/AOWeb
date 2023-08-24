@@ -78,14 +78,21 @@
                 .append('g').attr('transform', (d, i) => {
                     return `translate(${xScale(d.monthName)}, ${yScale(d.totalItems)})`;
                 });
-            newBarGroups.append('rect').attr('x',0)
+            newBarGroups
+                .append('rect')
+                .attr('x',0)
                 .attr('height', (d, i) => { return h - yScale(d.totalItems); })
                 .attr('width', xScale.bandwidth())
-                .attr('fill', 'black');
+                //.style('fill', 'transparent')
+                //.attr('y', 0)
+                //.attr('y', (d, i) => { return h - yScale(d.totalItems); })
+                //.transition().duration((d,i) => i*5)
+                //.delay((d,i) => i + 10)
+                .attr('fill', (d,i)=>{return `rgb(20,20,$(i * 15+ 80))`});
             // texts inside the column
             newBarGroups.append('text').attr('text-anchor', 'middle')
             .attr('x', (d,i) => {return xScale.bandwidth()/ 2;})
-            .attr('y', 40)
+            .attr('y', 60)
             .attr('fill', 'white')
             .style('font-size', '1em')
             .text((d,i) => d.totalItems.toLocaleString());
