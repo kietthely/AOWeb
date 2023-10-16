@@ -37,7 +37,6 @@ namespace AOWebApp.Controllers
             if(category != null)
             {
                 query = query.Where(i=> i.Category.ParentCategoryId ==  category); 
-
             }
             query = query.OrderBy(i => i.ItemName);
             return await query.ToListAsync();

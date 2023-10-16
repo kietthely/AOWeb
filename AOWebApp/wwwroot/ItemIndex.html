@@ -49,6 +49,7 @@
         // Button reference
         var buttonRef = document.getElementById("searchButton");
         // Add search event to the button
+
         buttonRef.addEventListener("click", searchEvent, false);
         // Fetch the category list
         fetch('/api/ParentCategoriesWebAPI')
@@ -73,8 +74,9 @@
             let searchText = searchValue;
 
             let searchQuery = '/api/ItemsWebAPI?';
+            console.log(document.getElementsByClassName('category'));
             let categoryId = document.getElementsByClassName('category')[0].value;
-
+            //console.log(document.getElementsByClassName('category'));
             if (categoryId) {
                 searchQuery += `category=${categoryId}`;
             }

@@ -1,4 +1,5 @@
 ﻿using AOWebApp.Data;
+using AOWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace AOWebApp.Controllers
         [Produces("application/json")]
         public IActionResult AnnualSalesReportData(int Year)
         {
+
             if (Year > 0) {
                 var order = _context.ItemsInOrders
                     .Where(iio => iio.OrderNumberNavigation.OrderDate.Year == Year)
@@ -39,23 +41,7 @@ namespace AOWebApp.Controllers
                     totalCost = group.Sum(iio => iio.TotalItemCost)
 
                 }).OrderBy(d => d.monthNo);
-                // OR
-                //var summaryQuery = _context.ItemsInOrders.Where(iio => iio.OrderNumberNavigation.OrderDate.Year == Year)
-                //.GroupBy(iio => new { iio.OrderNumberNavigation.OrderDate.Year, iio.OrderNumberNavigation.OrderDate.Month })
-                //.Select(obj => new
-                //{
-                //    year = obj.Key.Year,
-                //    month = obj.Key.Month,
-                //    monthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(obj.Key.Month),
-                //    totalItems = obj.Sum(iio => iio.NumberOf),
-                //    totalCost = obj.Sum(iio => iio.TotalItemCost)
-
-                //}).OrderBy(d => d.month);
-                //var summary = summaryQuery.Select(os => new
-                //{
-                //    os.year, os.month, monthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(os.month),
-                //    os.totalItems, os.totalCost
-                //});
+            
                 return Json(order);
             } else {
                 return BadRequest();

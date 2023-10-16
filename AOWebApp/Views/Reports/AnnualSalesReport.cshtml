@@ -18,9 +18,6 @@
 @section scripts{
 <script type="module">
     import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-    
-
-
     const svg = d3.select('svg');
     let w = svg.node().getBoundingClientRect().width;
 
@@ -65,8 +62,8 @@
             // get the range of items
             let totalItemsRange = d3.extent(dataSet, (d, i) => d.totalItems);
             let maxTotalItems = totalItemsRange[1];
-         
 
+            console.log(maxTotalItems);
             //dynamic scale
             let yScale = d3.scaleLinear().domain([0,maxTotalItems]).range([h,0]);
 
@@ -75,7 +72,9 @@
             let xScale = d3.scaleBand().domain(monthArray).range([0,w]).paddingInner(0.1);
             console.log('xScale: ' + xScale('March'));
             // get all columns
-            chartGroup = svg.append('g').classed('chartGroup', true).attr('transform', `translate(${chartMargins.left}, ${chartMargins.top})`);
+            chartGroup = svg.append('g')
+            .classed('chartGroup', true)
+            .attr('transform', `translate(${chartMargins.left}, ${chartMargins.top})`);
             let barGroups = chartGroup.selectAll('g').data(dataSet);
 
             // chart styling
